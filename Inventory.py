@@ -4,8 +4,20 @@ connection = sqlite3.connect("Inventory.db")
 cursor = connection.cursor()
 
 
-def initdb():
-    # Check if db exists
+def listTables():
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    print(cursor.fetchall())
+    return cursor.fetchall()
+
+
+def listColums(table):
+    cursor.execute("""PRAGMA table_info('{}');""".format(table))
+    print(cursor.fetchall())
+    return cursor
+
+
+def initDB():
+    # Check if table exists
     sql_command = """
     CREATE TABLE Inventory ( 
     itemnumber INTEGER PRIMARY KEY, 
@@ -21,12 +33,18 @@ def initdb():
 
     cursor.execute(sql_command)
     connection.commit()
-def checkifexist(dbname, query):
+
+
+def checkTfExist(dbname, query):
     print("todo")
+
+
+def listAll(db):
+    print("Todo")
+
 
 def search(db, query):
     print("todo")
-
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
@@ -39,7 +57,7 @@ def delete(db, itemnumber):
     connection.commit()
 
 
-def appeddb(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category):
+def appendDB(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category):
     # Check if exist func
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}","{}");"""
     print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
@@ -55,7 +73,10 @@ print("123")
 # appeddb("Inventory", "Helmet", "protective helmet", "WorkShop_P1", "5", "2", "7025150014106", "Ingar", "2019-08-21", "Hand tools") #eplejuce
 # appeddb("Inventory", "M5", "M5 hex 25mm", "WorkShop_S1", "73", "10", "", "", "2019-08-21", "Skrews")
 
-#delete("Inventory", 5)
-update("Inventory", 2, "stock", "4")
+# delete("Inventory", 5)
+# update("Inventory", 2, "stock", "4")
+
+#listTables()
+listColums("Inventory")
 print("321")
 connection.close()
