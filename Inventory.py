@@ -49,22 +49,25 @@ def listAll(db):
 
 def search(db, query):
     if query.isdigit():
-        for row in cursor.execute("SELECT itemnumber,barcode FROM {} WHERE name MATCH '%{}%';".format(db, query)):
+        for row in cursor.execute("SELECT itemnumber,barcode FROM {} WHERE name LIKE '%{}%';".format(db, query)):
             print(row)
     else:
         for row in cursor.execute("SELECT itemnumber,name FROM {} WHERE name LIKE '%{}%';".format(db, query)):
             print(row)
 
-    # print(cursor.execute(sql_command.format(db, query)))
-    # cursor.fetchall(sql_command.format(db, query))
-    # cursor.
-    # cursor.execute('SELECT * FROM {}'.format(db))
-    # rows = cursor.fetchall()
-    # for row in rows:
-    #     print(row[2])
-    #     print(row[6])
-    #     rows
-    #     # tuple
+    cursor.execute('SELECT * FROM {}'.format(db))
+    rows = cursor.fetchall()
+    for row in rows:
+        name = row[1]
+        description = row[2]
+        storelocation = row[3]
+        stock = row[4]
+        minstock = row[5]
+        barcode = row[6]
+        checkedoutby = row[7]
+        checkedoutdate = row[8]
+        category = row[9]
+        print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
 
 
 def update(db, itemnumber, colum, value):
@@ -98,6 +101,6 @@ print("123")
 # update("Inventory", 2, "stock", "4")
 
 #listTables()
-search("Inventory", "ammer")
+search("Inventory", "5000112637397")
 print("321")
 connection.close()
