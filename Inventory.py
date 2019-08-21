@@ -44,7 +44,9 @@ def listAll(db):
 
 
 def search(db, query):
-    print("todo")
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='{}';".format(db))
+    print(cursor.fetchall())
+
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
@@ -77,6 +79,6 @@ print("123")
 # update("Inventory", 2, "stock", "4")
 
 #listTables()
-listColums("Inventory")
+search("Inventory", 1)
 print("321")
 connection.close()
