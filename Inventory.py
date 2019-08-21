@@ -28,6 +28,11 @@ def search(db, query):
     print("todo")
 
 
+def update(db, itemnumber, colum, value):
+    sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
+    cursor.execute(sql_command.format(db, colum, value, itemnumber))
+    connection.commit()
+
 def delete(db, itemnumber):
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
     cursor.execute(sql_command.format(db, itemnumber))
@@ -50,6 +55,7 @@ print("123")
 # appeddb("Inventory", "Helmet", "protective helmet", "WorkShop_P1", "5", "2", "7025150014106", "Ingar", "2019-08-21", "Hand tools") #eplejuce
 # appeddb("Inventory", "M5", "M5 hex 25mm", "WorkShop_S1", "73", "10", "", "", "2019-08-21", "Skrews")
 
-delete("Inventory", 5)
+#delete("Inventory", 5)
+update("Inventory", 2, "stock", "4")
 print("321")
 connection.close()
