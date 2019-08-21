@@ -40,12 +40,31 @@ def checkTfExist(dbname, query):
 
 
 def listAll(db):
-    print("Todo")
+    cursor.execute('SELECT * FROM {}'.format(db))
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
+    return rows
 
 
 def search(db, query):
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='{}';".format(db))
-    print(cursor.fetchall())
+    if query.isdigit():
+        for row in cursor.execute("SELECT itemnumber,barcode FROM {} WHERE name MATCH '%{}%';".format(db, query)):
+            print(row)
+    else:
+        for row in cursor.execute("SELECT itemnumber,name FROM {} WHERE name LIKE '%{}%';".format(db, query)):
+            print(row)
+
+    # print(cursor.execute(sql_command.format(db, query)))
+    # cursor.fetchall(sql_command.format(db, query))
+    # cursor.
+    # cursor.execute('SELECT * FROM {}'.format(db))
+    # rows = cursor.fetchall()
+    # for row in rows:
+    #     print(row[2])
+    #     print(row[6])
+    #     rows
+    #     # tuple
 
 
 def update(db, itemnumber, colum, value):
@@ -79,6 +98,6 @@ print("123")
 # update("Inventory", 2, "stock", "4")
 
 #listTables()
-search("Inventory", 1)
+search("Inventory", "ammer")
 print("321")
 connection.close()
