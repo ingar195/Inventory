@@ -134,6 +134,7 @@ def menu():
         inputval = input("Scan barcode or write name:\n")
         itenmnumber = search("Inventory", inputval)
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
+        # update 2 things at same tine
 
 # listTables()
 
