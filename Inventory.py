@@ -1,4 +1,6 @@
 import sqlite3
+from datetime import date
+
 connection = sqlite3.connect("Inventory.db")
 
 cursor = connection.cursor()
@@ -48,12 +50,6 @@ def listAll(db):
 
 
 def search(db, query):
-    if query.isdigit():
-        for row in cursor.execute("SELECT itemnumber,barcode FROM {} WHERE name LIKE '%{}%';".format(db, query)):
-            print(row)
-    else:
-        for row in cursor.execute("SELECT itemnumber,name FROM {} WHERE name LIKE '%{}%';".format(db, query)):
-            print(row)
 
     cursor.execute('SELECT * FROM {}'.format(db))
     rows = cursor.fetchall()
@@ -68,6 +64,20 @@ def search(db, query):
         checkedoutdate = row[8]
         category = row[9]
         print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
+        if query.isdigit():
+            if query == barcode:
+                print("Found the bar code:\n"
+                      "Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+                      "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+            else:
+                print("not found")
+
+        else:
+            print("Found the querry:\n"
+                  "Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+                  "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+
+
 
 
 def update(db, itemnumber, colum, value):
@@ -90,8 +100,32 @@ def appendDB(table, name, description, storelocation, stock, minstock, barcode, 
     connection.commit()
 
 
+def menu():
+    print("Press S for search\n"
+          "Press A to add\n"
+          "Press U to update\n"
+          "Press E to exit\n"
+          "Press enter to select"
+    )
+    menuselection = input()
+    if menuselection == "s":
+        searchphrase = input("Enter search phrase\n")
+        search("Inventory", searchphrase)
+    elif menuselection == "a":
+        name = input("Enter name: ")
+        description = input("Enter description: ")
+        storelocation = input("Enter store location: ")
+        stock = input("Enter stock: ")
+        minstock = input("Enter min stock: ")
+        barcode = input("Enter barcode (you can scan the barcode): ")
+        checkedoutby = input("Enter the name that checked out the item ")
+        checkedoutdate = date.today()
+        category = input("Enter Category: ")
+        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category)
+
+
 # initdb()
-print("123")
+
 
 # appeddb("Inventory", "Hammer", "Bighammer", "WorkShop_A3", "1", "0", "5000112637397", "Ingar", "2019-08-21", "Hand tools") # cola
 # appeddb("Inventory", "Helmet", "protective helmet", "WorkShop_P1", "5", "2", "7025150014106", "Ingar", "2019-08-21", "Hand tools") #eplejuce
@@ -101,6 +135,6 @@ print("123")
 # update("Inventory", 2, "stock", "4")
 
 #listTables()
-search("Inventory", "5000112637397")
-print("321")
+menu()
+
 connection.close()
