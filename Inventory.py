@@ -106,7 +106,7 @@ def menu():
     print("Press S for search\n"
           "Press A to add\n"
           "Press U to update\n"
-          "Press E to exit\n"
+          "Press C to checkout\n"
           "Press enter to select"
     )
     menuselection = input()
@@ -127,7 +127,11 @@ def menu():
     elif menuselection.isdigit():
         search("Inventory", menuselection)
     elif menuselection == "u":
-        inputval = input("Scan barcode ore write name:\n")
+        inputval = input("Scan barcode or write name:\n")
+        itenmnumber = search("Inventory", inputval)
+        update("Inventory", itenmnumber, "stock", input("new Stock\n"))
+    elif menuselection == "c":
+        inputval = input("Scan barcode or write name:\n")
         itenmnumber = search("Inventory", inputval)
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
