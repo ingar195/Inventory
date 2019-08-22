@@ -77,6 +77,8 @@ def search(db, query):
                 print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
+        return stock, minstock
+
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
@@ -99,8 +101,10 @@ def appendDB(table, name, description, storelocation, stock, minstock, barcode, 
     connection.commit()
 
 
-def checkMinStock():
-    print("Todo")
+def checkMinStock(stock, minstock):
+
+
+    return val
 
 
 def menu():
@@ -143,7 +147,7 @@ def menu():
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
         itenmnumber = search("Inventory", inputval)
-        update("Inventory", itenmnumber, "stock", input("new Stock\n"))
+        print("Inventory", itenmnumber, "stock", input("new Stock\n"))
         # update 2 things at same tine
 
     elif menuselection == "l":

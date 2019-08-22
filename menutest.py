@@ -1,2 +1,5 @@
-import re
-print(re.search('123', 'TeSt', re.IGNORECASE))
+def retunrtest(stock, minstock):
+    return stock, minstock
+
+
+print(retunrtest(1, 2))
