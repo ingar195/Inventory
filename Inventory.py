@@ -1,4 +1,5 @@
 import sqlite3
+import re
 from datetime import date
 
 connection = sqlite3.connect("Inventory.db")
@@ -74,9 +75,10 @@ def search(db, query):
                 print("not found")
 
         else:
-            print("Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
-                  "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-
+            # fix regx ignore caps
+            if re.search(query, name, re.IGNORECASE) is not None:
+                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
+                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 
 
@@ -91,21 +93,23 @@ def delete(db, itemnumber):
     connection.commit()
 
 
-def appendDB(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category):
+def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
     # Check if exist func
-    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}","{}");"""
-    print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
-    cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
+    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, checkedoutdate, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}";"""
+    print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
+    cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
     connection.commit()
 
 
 def menu():
-    print("Press S for search\n"
+    print("\n"
+          "Press S for search\n"
           "Press A to add\n"
           "Press U to update\n"
           "Press C to checkout\n"
           "Press L to list all items\n"
+          "Press D to delete a items\n"
           "Press enter to select"
     )
     menuselection = input()
@@ -120,17 +124,18 @@ def menu():
         stock = input("Enter stock: ")
         minstock = input("Enter min stock: ")
         barcode = input("Enter barcode (you can scan the barcode): ")
-        checkedoutby = input("Enter the name that checked out the item ")
-        checkedoutdate = date.today()
+        # checkedoutby = input("Enter the name that checked out the item ")
+        # checkedoutdate = date.today()
         category = input("Enter Category: ")
-        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category)
+        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
 
     elif menuselection.isdigit():
         search("Inventory", menuselection)
 
     elif menuselection == "u":
         inputval = input("Scan barcode or write name:\n")
-        itenmnumber = search("Inventory", inputval)
+        search("Inventory", inputval)
+        itenmnumber = input("Inventory number: ")
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
     elif menuselection == "c":
