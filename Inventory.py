@@ -68,16 +68,18 @@ def search(db, query):
 
         if query.isdigit():
             if query == barcode:
-                print("Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
-                      "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                # returnval = checkMinStock(stock, minstock)
             else:
-                print("not found")
+                print("debug")
         else:
             if re.search(query, name, re.IGNORECASE) is not None:
                 print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                 # returnval = checkMinStock(stock, minstock)
+    # return returnval
 
-        return stock, minstock
 
 
 def update(db, itemnumber, colum, value):
@@ -102,8 +104,13 @@ def appendDB(table, name, description, storelocation, stock, minstock, barcode, 
 
 
 def checkMinStock(stock, minstock):
-
-
+    minstock = int(minstock)
+    stock = int(stock)
+    if stock <= minstock:
+        val = "Stock({}) is less than minstock({})".format(stock, minstock)
+    else:
+        val = "Stock({}) is more than minstock({})".format(stock, minstock)
+    print("val = {}".format(val))
     return val
 
 
@@ -146,8 +153,16 @@ def menu():
 
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
-        itenmnumber = search("Inventory", inputval)
-        print("Inventory", itenmnumber, "stock", input("new Stock\n"))
+        search("Inventory", inputval)
+        itenmnumber = input("Enter itenmnumber: ")
+        value = input("Enter new value: ")
+        update("Inventory", itenmnumber, value)
+
+    elif menuselection == "d":
+        inputval = input("Scan barcode or write name:\n")
+        search("Inventory", inputval)
+        itenmnumber = input("Enter itenmnumber: ")
+        delete("Inventory", itenmnumber)
         # update 2 things at same tine
 
     elif menuselection == "l":
