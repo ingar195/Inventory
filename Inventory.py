@@ -19,6 +19,17 @@ def listColums(table):
     return cursor
 
 
+def initDBCategory():
+    # Check if table exists
+    sql_command = """
+    CREATE TABLE Category ( 
+    itemnumber INTEGER PRIMARY KEY, 
+    name VARCHAR(255));"""
+    print(sql_command)
+    cursor.execute(sql_command)
+    connection.commit()
+
+
 def initDB():
     # Check if table exists
     sql_command = """
@@ -32,11 +43,18 @@ def initDB():
     barcode VARCHAR(255), 
     checkedoutby VARCHAR(255), 
     checkedoutdate VARCHAR(255),
-    category VARCHAR(255);"""
+    category VARCHAR(255));"""
 
     cursor.execute(sql_command)
     connection.commit()
 
+    sql_command = """
+    CREATE TABLE Category ( 
+    itemnumber INTEGER PRIMARY KEY, 
+    name VARCHAR(255);"""
+
+    cursor.execute(sql_command)
+    connection.commit()
 
 def checkTfExist(dbname, query):
     print("todo")
@@ -47,38 +65,46 @@ def listAll(db):
     rows = cursor.fetchall()
     for row in rows:
         print(row)
-    # return rows
+    return rows
 
 
 def search(db, query):
     cursor.execute('SELECT * FROM {}'.format(db))
     rows = cursor.fetchall()
-
-    for row in rows:
-        itemnumber = row[0]
-        name = row[1]
-        description = row[2]
-        storelocation = row[3]
-        stock = row[4]
-        minstock = row[5]
-        barcode = row[6]
-        checkedoutby = row[7]
-        checkedoutdate = row[8]
-        category = row[9]
-
-        if query.isdigit():
-            if query == barcode:
-                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
-                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-                # returnval = checkMinStock(stock, minstock)
-            else:
-                print("")
-        else:
+    if db is not "Inventory":
+        for row in rows:
+            itemnumber = row[0]
+            name = row[1]
             if re.search(query, name, re.IGNORECASE) is not None:
-                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
-                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-                 # returnval = checkMinStock(stock, minstock)
-    # return returnval
+                print(
+                    "Itemnumber: {}, Name: {}".format(itemnumber, name))
+
+    else:
+        for row in rows:
+            itemnumber = row[0]
+            name = row[1]
+            description = row[2]
+            storelocation = row[3]
+            stock = row[4]
+            minstock = row[5]
+            barcode = row[6]
+            checkedoutby = row[7]
+            checkedoutdate = row[8]
+            category = row[9]
+
+            if query.isdigit():
+                if query == barcode:
+                    print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+                          "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                    # returnval = checkMinStock(stock, minstock)
+                else:
+                    print("")
+            else:
+                if re.search(query, name, re.IGNORECASE) is not None:
+                    print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
+                          "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                     # returnval = checkMinStock(stock, minstock)
+        # return returnval
 
 
 
@@ -88,18 +114,28 @@ def update(db, itemnumber, colum, value):
     connection.commit()
 
 
-def delete(db, itemnumber):
+def delete(db):
+    inputval = input("Scan barcode or write name:\n")
+    search(db, inputval)
+    itemnumber = input("Enter item number you want to delete: ")
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
     cursor.execute(sql_command.format(db, itemnumber))
     connection.commit()
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
-    # Check if exist func
+    if category.isdigit():
+        print("")
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
-    # print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
     cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
+    connection.commit()
+
+
+def appendDBCategory(table, name):
+    # Check if exist func
+    sql_command = """INSERT INTO {} (itemnumber, name) VALUES (null,"{}");"""
+    cursor.execute(sql_command.format(table, name))
     connection.commit()
 
 
@@ -114,6 +150,28 @@ def checkMinStock(stock, minstock):
     return val
 
 
+def categoryMenu():
+    while True:
+        print("\n"
+              "Press A to add\n"
+              "Press L to list all categories\n"
+              "Press D to delete a categories\n"
+              "Press enter to select"
+        )
+        menuselection = input()
+        if menuselection == "a":
+            name = input("Enter Category name: ")
+            appendDBCategory("Category", name)
+        elif menuselection == "l":
+            listAll("Category")
+        elif menuselection == "d":
+            delete("Category")
+        else:
+            menu()
+
+
+
+
 def menu():
     print("\n"
           "Press S for search\n"
@@ -122,6 +180,7 @@ def menu():
           "Press C to checkout\n"
           "Press L to list all items\n"
           "Press D to delete a items\n"
+          "Press cat to goto category menu\n"
           "Press enter to select"
     )
     menuselection = input()
@@ -138,8 +197,24 @@ def menu():
         barcode = input("Enter barcode (you can scan the barcode): ")
         # checkedoutby = input("Enter the name that checked out the item ")
         # checkedoutdate = date.today()
-        category = input("Enter Category: ")
-        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
+        listAll("Category")
+        category = input("Select a number from the list or write new: ")
+        if category.isdigit():
+            rows = listAll("Category")
+            print("debuga: {}".format(rows))
+            for row in rows:
+                print("debugb: {}".format(row))
+                if row[0] == int(category):
+                    print("If " + row[1])
+                    category = row[1]
+                    print(category)
+                else:
+                    print("row[0]{} == category:{}".format(row[0], category))
+            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
+        else:
+            appendDBCategory("Category", category)
+            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
+
 
     elif menuselection.isdigit():
         search("Inventory", menuselection)
@@ -160,19 +235,17 @@ def menu():
 
 
     elif menuselection == "d":
-        inputval = input("Scan barcode or write name:\n")
-        search("Inventory", inputval)
-        itenmnumber = input("Enter item number you want to delete: ")
-        delete("Inventory", itenmnumber)
-        # update 2 things at same tine
+        delete("Inventory")
+        # brude slette vist strekkode blr skreve inn
+
+    elif menuselection == "cat":
+        categoryMenu()
 
     elif menuselection == "l":
         search("Inventory", "")
+
     else:
         print("Invalid")
-
-
-# listTables()
 
 
 while True:
