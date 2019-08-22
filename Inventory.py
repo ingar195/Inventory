@@ -72,7 +72,7 @@ def search(db, query):
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
                 # returnval = checkMinStock(stock, minstock)
             else:
-                print("debug")
+                print("")
         else:
             if re.search(query, name, re.IGNORECASE) is not None:
                 print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
@@ -96,7 +96,7 @@ def delete(db, itemnumber):
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
     # Check if exist func
-    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, checkedoutdate, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}";"""
+    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
     print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
     cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
@@ -154,14 +154,15 @@ def menu():
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Enter itenmnumber: ")
+        itenmnumber = input("Enter itenm number: ")
         value = input("Enter new value: ")
-        update("Inventory", itenmnumber, value)
+        update("Inventory", itenmnumber, "stock", value)
+
 
     elif menuselection == "d":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Enter itenmnumber: ")
+        itenmnumber = input("Enter item number you want to delete: ")
         delete("Inventory", itenmnumber)
         # update 2 things at same tine
 
@@ -181,4 +182,4 @@ connection.close()
 
 
 
-
+# get store lokations ?
