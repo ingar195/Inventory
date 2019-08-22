@@ -67,16 +67,14 @@ def search(db, query):
         # print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
         if query.isdigit():
             if query == barcode:
-                print("Found the bar code:\n"
-                      "Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+                print("Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
                       "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
                 return itemnumber
             else:
                 print("not found")
 
         else:
-            print("Found the querry:\n"
-                  "Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+            print("Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                   "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 
@@ -142,16 +140,19 @@ def menu():
         # update 2 things at same tine
 
     elif menuselection == "l":
-        inputval = input("Scan barcode or write name:\n")
-        itenmnumber = search("Inventory", inputval)
-        update("Inventory", itenmnumber, "stock", input("new Stock\n"))
+        search("Inventory", "")
         # update 2 things at same tine
+    else:
+        print("Invalid")
+
+
 # listTables()
+
 
 while True:
     menu()
-
 connection.close()
+
 
 
 
