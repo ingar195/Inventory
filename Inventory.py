@@ -229,7 +229,6 @@ def menu():
         category = test("Category")
         appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
 
-
     elif menuselection.isdigit():
         search("Inventory", menuselection)
 
@@ -246,7 +245,6 @@ def menu():
         itenmnumber = input("Enter itenm number: ")
         value = input("Enter new value: ")
         update("Inventory", itenmnumber, "stock", value)
-
 
     elif menuselection == "d":
         delete("Inventory")
@@ -265,8 +263,3 @@ def menu():
 while True:
     menu()
 connection.close()
-
-
-
-
-# get store lokations ?
