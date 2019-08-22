@@ -29,6 +29,15 @@ def initDBCategory():
     cursor.execute(sql_command)
     connection.commit()
 
+def tmp():
+    sql_command = """
+    CREATE TABLE Location ( 
+    itemnumber INTEGER PRIMARY KEY, 
+    name VARCHAR(255));"""
+
+    cursor.execute(sql_command)
+    connection.commit()
+
 
 def initDB():
     # Check if table exists
@@ -51,7 +60,15 @@ def initDB():
     sql_command = """
     CREATE TABLE Category ( 
     itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255);"""
+    name VARCHAR(255));"""
+
+    cursor.execute(sql_command)
+    connection.commit()
+
+    sql_command = """
+    CREATE TABLE Location ( 
+    itemnumber INTEGER PRIMARY KEY, 
+    name VARCHAR(255));"""
 
     cursor.execute(sql_command)
     connection.commit()
@@ -100,11 +117,10 @@ def search(db, query):
                 else:
                     print("")
             else:
-                if re.search(query, name, re.IGNORECASE) is not None:
+                if re.search(query, name, re.IGNORECASE) is not None or re.search(query, description, re.IGNORECASE) is not None or re.search(query, category, re.IGNORECASE) is not None:
                     print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                           "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
                      # returnval = checkMinStock(stock, minstock)
-        # return returnval
 
 
 
@@ -170,6 +186,19 @@ def categoryMenu():
             menu()
 
 
+def test(db):
+    listAll(db)
+    var = input("Select a number from the list for {} or write new: ".format(db))
+    if var.isdigit():
+        rows = listAll(db)
+        for row in rows:
+            if row[0] == int(var):
+                var = row[1]
+            else:
+                print("row[0]{} == category:{}".format(row[0], var))
+    else:
+        appendDBCategory(db, var)
+    return var
 
 
 def menu():
@@ -191,29 +220,14 @@ def menu():
     elif menuselection == "a":
         name = input("Enter name: ")
         description = input("Enter description: ")
-        storelocation = input("Enter store location: ")
+        storelocation = test("Location")
+        print("123 {}".format(storelocation))
         stock = input("Enter stock: ")
         minstock = input("Enter min stock: ")
         barcode = input("Enter barcode (you can scan the barcode): ")
-        # checkedoutby = input("Enter the name that checked out the item ")
-        # checkedoutdate = date.today()
-        listAll("Category")
-        category = input("Select a number from the list or write new: ")
-        if category.isdigit():
-            rows = listAll("Category")
-            print("debuga: {}".format(rows))
-            for row in rows:
-                print("debugb: {}".format(row))
-                if row[0] == int(category):
-                    print("If " + row[1])
-                    category = row[1]
-                    print(category)
-                else:
-                    print("row[0]{} == category:{}".format(row[0], category))
-            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
-        else:
-            appendDBCategory("Category", category)
-            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
+
+        category = test("Category")
+        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
 
 
     elif menuselection.isdigit():
