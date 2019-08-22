@@ -51,9 +51,9 @@ def listAll(db):
 
 
 def search(db, query):
-
     cursor.execute('SELECT * FROM {}'.format(db))
     rows = cursor.fetchall()
+
     for row in rows:
         itemnumber = row[0]
         name = row[1]
@@ -65,27 +65,24 @@ def search(db, query):
         checkedoutby = row[7]
         checkedoutdate = row[8]
         category = row[9]
-        # print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
+
         if query.isdigit():
             if query == barcode:
                 print("Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
                       "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-                return itemnumber
             else:
                 print("not found")
-
         else:
-            # fix regx ignore caps
             if re.search(query, name, re.IGNORECASE) is not None:
                 print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-
 
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
     cursor.execute(sql_command.format(db, colum, value, itemnumber))
     connection.commit()
+
 
 def delete(db, itemnumber):
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
@@ -100,6 +97,10 @@ def appendDB(table, name, description, storelocation, stock, minstock, barcode, 
     cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
     connection.commit()
+
+
+def checkMinStock():
+    print("Todo")
 
 
 def menu():
@@ -135,7 +136,8 @@ def menu():
     elif menuselection == "u":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Inventory number: ")
+        itenmnumber = input("Inventory number or R: ")
+        # Add retry
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
     elif menuselection == "c":
@@ -146,7 +148,6 @@ def menu():
 
     elif menuselection == "l":
         search("Inventory", "")
-        # update 2 things at same tine
     else:
         print("Invalid")
 
