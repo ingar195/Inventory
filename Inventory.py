@@ -46,7 +46,7 @@ def listAll(db):
     rows = cursor.fetchall()
     for row in rows:
         print(row)
-    return rows
+    # return rows
 
 
 def search(db, query):
@@ -54,6 +54,7 @@ def search(db, query):
     cursor.execute('SELECT * FROM {}'.format(db))
     rows = cursor.fetchall()
     for row in rows:
+        itemnumber = row[0]
         name = row[1]
         description = row[2]
         storelocation = row[3]
@@ -63,12 +64,13 @@ def search(db, query):
         checkedoutby = row[7]
         checkedoutdate = row[8]
         category = row[9]
-        print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
+        # print("{} {} {} {} {} {} {} {} {} ".format(name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category))
         if query.isdigit():
             if query == barcode:
                 print("Found the bar code:\n"
                       "Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
                       "".format(name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+                return itemnumber
             else:
                 print("not found")
 
@@ -122,19 +124,16 @@ def menu():
         checkedoutdate = date.today()
         category = input("Enter Category: ")
         appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, checkedoutby, checkedoutdate, category)
+    elif menuselection.isdigit():
+        search("Inventory", menuselection)
+    elif menuselection == "u":
+        inputval = input("Scan barcode ore write name:\n")
+        itenmnumber = search("Inventory", inputval)
+        update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
+# listTables()
 
-# initdb()
-
-
-# appeddb("Inventory", "Hammer", "Bighammer", "WorkShop_A3", "1", "0", "5000112637397", "Ingar", "2019-08-21", "Hand tools") # cola
-# appeddb("Inventory", "Helmet", "protective helmet", "WorkShop_P1", "5", "2", "7025150014106", "Ingar", "2019-08-21", "Hand tools") #eplejuce
-# appeddb("Inventory", "M5", "M5 hex 25mm", "WorkShop_S1", "73", "10", "", "", "2019-08-21", "Skrews")
-
-# delete("Inventory", 5)
-# update("Inventory", 2, "stock", "4")
-
-#listTables()
-menu()
+while True:
+    menu()
 
 connection.close()
