@@ -97,7 +97,7 @@ def delete(db, itemnumber):
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
     # Check if exist func
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
-    print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
+    # print(" debug: " + sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
     cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
     connection.commit()
