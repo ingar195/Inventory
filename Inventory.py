@@ -19,26 +19,6 @@ def listColums(table):
     return cursor
 
 
-def initDBCategory():
-    # Check if table exists
-    sql_command = """
-    CREATE TABLE Category ( 
-    itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255));"""
-    print(sql_command)
-    cursor.execute(sql_command)
-    connection.commit()
-
-def tmp():
-    sql_command = """
-    CREATE TABLE Location ( 
-    itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255));"""
-
-    cursor.execute(sql_command)
-    connection.commit()
-
-
 def initDB():
     # Check if table exists
     sql_command = """
@@ -72,9 +52,6 @@ def initDB():
 
     cursor.execute(sql_command)
     connection.commit()
-
-def checkTfExist(dbname, query):
-    print("todo")
 
 
 def listAll(db):
@@ -120,8 +97,10 @@ def search(db, query):
                 if re.search(query, name, re.IGNORECASE) is not None or re.search(query, description, re.IGNORECASE) is not None or re.search(query, category, re.IGNORECASE) is not None:
                     print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                           "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-                     # returnval = checkMinStock(stock, minstock)
 
+def sqlCommand(sql_command):
+    cursor.execute(sql_command)
+    connection.commit()
 
 
 def update(db, itemnumber, colum, value):
