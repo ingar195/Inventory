@@ -172,12 +172,13 @@ def test(db):
         rows = listAll(db)
         for row in rows:
             if row[0] == int(var):
-                var = row[1]
+                var2 = row[1]
             else:
                 print("row[0]{} == category:{}".format(row[0], var))
     else:
-        appendDBCategory(db, var)
-    return var
+        var2 = var
+        appendDBCategory(db, var2)
+    return var2
 
 
 def menu():
