@@ -86,17 +86,17 @@ def search(db, query):
             checkedoutdate = row[8]
             category = row[9]
 
-            if query.isdigit():
-                if query == barcode:
-                    print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
-                          "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-                    # returnval = checkMinStock(stock, minstock)
-                else:
-                    print("")
-            else:
-                if re.search(query, name, re.IGNORECASE) is not None or re.search(query, description, re.IGNORECASE) is not None or re.search(query, category, re.IGNORECASE) is not None:
-                    print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
-                          "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+            # if query.isdigit():
+            #     if query == barcode:
+            #         print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
+            #               "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+            #         # returnval = checkMinStock(stock, minstock)
+            #     else:
+            #         print("")
+            # else:
+            if re.search(query, name, re.IGNORECASE) is not None or re.search(query, description, re.IGNORECASE) is not None or re.search(query, category, re.IGNORECASE) is not None or re.search(query, barcode, re.IGNORECASE) is not None:
+                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
+                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 def sqlCommand(sql_command):
     cursor.execute(sql_command)
