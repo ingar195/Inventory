@@ -228,7 +228,6 @@ def menu():
 
     elif menuselection == "d":
         delete("Inventory")
-        # brude slette vist strekkode blr skreve inn
 
     elif menuselection == "cat":
         categoryMenu()
@@ -243,3 +242,5 @@ def menu():
 while True:
     menu()
 connection.close()
+
+# gard was here
