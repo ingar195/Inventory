@@ -70,8 +70,7 @@ def search(db, query):
             itemnumber = row[0]
             name = row[1]
             if re.search(query, name, re.IGNORECASE) is not None:
-                print(
-                    "Itemnumber: {}, Name: {}".format(itemnumber, name))
+                print("Itemnumber: {}, Name: {}".format(itemnumber, name))
 
     else:
         for row in rows:
@@ -85,16 +84,7 @@ def search(db, query):
             checkedoutby = row[7]
             checkedoutdate = row[8]
             category = row[9]
-
-            # if query.isdigit():
-            #     if query == barcode:
-            #         print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}\n"
-            #               "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-            #         # returnval = checkMinStock(stock, minstock)
-            #     else:
-            #         print("")
-            # else:
-            if re.search(query, name, re.IGNORECASE) is not None or re.search(query, description, re.IGNORECASE) is not None or re.search(query, category, re.IGNORECASE) is not None or re.search(query, barcode, re.IGNORECASE) is not None:
+            if query.lower() in (name+description+storelocation+barcode).lower():
                 print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
@@ -145,54 +135,27 @@ def checkMinStock(stock, minstock):
     return val
 
 
-def categoryMenu():
-    while True:
-        print("\n"
-              "Press A to add\n"
-              "Press L to list all categories\n"
-              "Press D to delete a categories\n"
-              "Press enter to select"
-        )
-        menuselection = input()
-        if menuselection == "a":
-            name = input("Enter Category name: ")
-            appendDBCategory("Category", name)
-        elif menuselection == "l":
-            listAll("Category")
-        elif menuselection == "d":
-            delete("Category")
-        else:
-            menu()
-
-
 def test(db):
     listAll(db)
     var = input("Select a number from the list for {} or write new: ".format(db))
-    if var.isdigit():
-        rows = listAll(db)
-        for row in rows:
-            if row[0] == int(var):
-                var2 = row[1]
-            else:
-                print("row[0]{} == category:{}".format(row[0], var))
-    else:
-        var2 = var
-        appendDBCategory(db, var2)
-    return var2
+    appendDBCategory(db, var)
+    return var
 
 
 def menu():
-    print("\n"
-          "Press S for search\n"
-          "Press A to add\n"
-          "Press U to update\n"
-          "Press C to checkout\n"
-          "Press L to list all items\n"
-          "Press D to delete a items\n"
-          "Press cat to goto category menu\n"
-          "Press enter to select"
-    )
-    menuselection = input()
+    print("""
+    
+Press S for search
+Press A to add
+Press U to update
+Press C to checkout
+Press L to list all items
+Press D to delete a items
+Press cat to goto category menu
+Press Q to exit
+
+    """)
+    menuselection = input().lower()
     if menuselection == "s":
         searchphrase = input("Enter search phrase\n")
         search("Inventory", searchphrase)
@@ -201,7 +164,7 @@ def menu():
         name = input("Enter name: ")
         description = input("Enter description: ")
         storelocation = test("Location")
-        print("123 {}".format(storelocation))
+        print(storelocation)
         stock = input("Enter stock: ")
         minstock = input("Enter min stock: ")
         barcode = input("Enter barcode (you can scan the barcode): ")
@@ -230,10 +193,35 @@ def menu():
         delete("Inventory")
 
     elif menuselection == "cat":
-        categoryMenu()
+        while True:
+            print("""
+            
+Press A to add
+Press L to list all categories
+Press D to delete a categories
+Press Q to exit to main menu
+Press enter to select
+
+""")
+            menuselection = input()
+            if menuselection == "a":
+                name = input("Enter Category name: ")
+                appendDBCategory("Category", name)
+            elif menuselection == "l":
+                listAll("Category")
+            elif menuselection == "d":
+                delete("Category")
+            elif menuselection == "q":
+                break
+            else:
+                continue
+
 
     elif menuselection == "l":
         search("Inventory", "")
+
+    elif menuselection == "q":
+        quit()
 
     else:
         print("Invalid")
