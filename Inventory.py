@@ -1,20 +1,25 @@
 import sqlite3
 import re
-from datetime import date
-
+import logging
 connection = sqlite3.connect("Inventory.db")
 
 cursor = connection.cursor()
 
 
 def listTables():
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    try:
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    except:
+        logging.error("listTables execute failed")
     print(cursor.fetchall())
     return cursor.fetchall()
 
 
 def listColums(table):
-    cursor.execute("""PRAGMA table_info('{}');""".format(table))
+    try:
+        cursor.execute("""PRAGMA table_info('{}');""".format(table))
+    except:
+        logging.error("listColums execute failed")
     print(cursor.fetchall())
     return cursor
 
@@ -34,7 +39,10 @@ def initDB():
     checkedoutdate VARCHAR(255),
     category VARCHAR(255));"""
 
-    cursor.execute(sql_command)
+    try:
+        cursor.execute(sql_command)
+    except:
+        logging.error("initDB failed to execute")
     connection.commit()
 
     sql_command = """
@@ -42,20 +50,28 @@ def initDB():
     itemnumber INTEGER PRIMARY KEY, 
     name VARCHAR(255));"""
 
-    cursor.execute(sql_command)
+    try:
+        cursor.execute(sql_command)
+    except:
+        logging.error("initdb failed to execute command 2")
     connection.commit()
 
     sql_command = """
     CREATE TABLE Location ( 
     itemnumber INTEGER PRIMARY KEY, 
     name VARCHAR(255));"""
-
-    cursor.execute(sql_command)
+    try:
+        cursor.execute(sql_command)
+    except:
+        logging.error("initdb failed to execute command 3")
     connection.commit()
 
 
 def listAll(db):
-    cursor.execute('SELECT * FROM {}'.format(db))
+    try:
+        cursor.execute('SELECT * FROM {}'.format(db))
+    except:
+        logging.error("listAll failed to execute")
     rows = cursor.fetchall()
     for row in rows:
         print(row)
@@ -63,7 +79,10 @@ def listAll(db):
 
 
 def search(db, query):
-    cursor.execute('SELECT * FROM {}'.format(db))
+    try:
+        cursor.execute('SELECT * FROM {}'.format(db))
+    except:
+        logging.error("search failed to execute")
     rows = cursor.fetchall()
     if db is not "Inventory":
         for row in rows:
@@ -89,13 +108,19 @@ def search(db, query):
                       "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 def sqlCommand(sql_command):
-    cursor.execute(sql_command)
+    try:
+        cursor.execute(sql_command)
+    except:
+        logging.error("sqlCommand failed to execute")
     connection.commit()
 
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
-    cursor.execute(sql_command.format(db, colum, value, itemnumber))
+    try:
+        cursor.execute(sql_command.format(db, colum, value, itemnumber))
+    except:
+        logging.error("update failed to execute")
     connection.commit()
 
 
@@ -109,8 +134,6 @@ def delete(db):
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
-    if category.isdigit():
-        print("")
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
     cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
 
@@ -227,8 +250,12 @@ Press enter to select
         print("Invalid")
 
 
-while True:
-    menu()
-connection.close()
+if __name__ == '__main__':
+
+    while True:
+        menu()
+    connection.close()
+else:
+    pass
 
 # gard was here
