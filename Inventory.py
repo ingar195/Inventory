@@ -129,13 +129,19 @@ def delete(db):
     search(db, inputval)
     itemnumber = input("Enter item number you want to delete: ")
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
-    cursor.execute(sql_command.format(db, itemnumber))
+    try:
+        cursor.execute(sql_command.format(db, itemnumber))
+    except:
+        logging.error("delete failed to execute")
     connection.commit()
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
-    cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
+    try:
+        cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
+    except:
+        logging.error("appendDB failed to execute")
 
     connection.commit()
 
@@ -143,7 +149,10 @@ def appendDB(table, name, description, storelocation, stock, minstock, barcode, 
 def appendDBCategory(table, name):
     # Check if exist func
     sql_command = """INSERT INTO {} (itemnumber, name) VALUES (null,"{}");"""
-    cursor.execute(sql_command.format(table, name))
+    try:
+        cursor.execute(sql_command.format(table, name))
+    except:
+        logging.error("appendDBCategory failed to execute")
     connection.commit()
 
 
@@ -158,6 +167,7 @@ def checkMinStock(stock, minstock):
     return val
 
 
+# TODO: remove test function
 def test(db):
     listAll(db)
     var = input("Select a number from the list for {} or write new: ".format(db))
