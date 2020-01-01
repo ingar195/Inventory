@@ -185,6 +185,7 @@ Press C to checkout
 Press L to list all items
 Press D to delete a items
 Press cat to goto category menu
+Press store to goto category menu
 Press Q to exit
 
     """)
@@ -244,6 +245,31 @@ Press enter to select
                 listAll("Category")
             elif menuselection == "d":
                 delete("Category")
+            elif menuselection == "q":
+                break
+            else:
+                continue
+
+
+    elif menuselection == "store":
+        while True:
+            print("""
+            
+Press A to add
+Press L to list all store location
+Press D to delete a store location
+Press Q to exit to main menu
+Press enter to select
+
+""")
+            menuselection = input()
+            if menuselection == "a":
+                name = input("Enter Location name: ")
+                appendDBCategory("Location", name)
+            elif menuselection == "l":
+                listAll("Location")
+            elif menuselection == "d":
+                delete("Location")
             elif menuselection == "q":
                 break
             else:
