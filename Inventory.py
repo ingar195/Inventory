@@ -184,7 +184,8 @@ def test(db):
     dbreturn = listAll(db)
 
     var = input("Select a number from the list for {} or write new: ".format(db))
-    if var.isdigit == True:
+    try:
+        var = int(var)
         for x in dbreturn:
             if str(x[0]) == str(var):
                 print("for if")
@@ -192,7 +193,7 @@ def test(db):
             else:
                 print("for else")
                 pass
-    else:
+    except:
         print("else {}".format(var))
         appendDBCategory(db, var)
         return var
