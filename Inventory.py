@@ -37,7 +37,8 @@ def initDB():
     barcode VARCHAR(255), 
     checkedoutby VARCHAR(255), 
     checkedoutdate VARCHAR(255),
-    category VARCHAR(255));"""
+    category VARCHAR(255)),
+    Sublocation VARCHAR(255));"""
 
     try:
         cursor.execute(sql_command)
@@ -66,6 +67,16 @@ def initDB():
         logging.error("initdb failed to execute command 3")
     connection.commit()
 
+    sql_command = """
+    CREATE TABLE SubLocation ( 
+    itemnumber INTEGER PRIMARY KEY, 
+    name VARCHAR(255));"""
+    try:
+        cursor.execute(sql_command)
+    except:
+        logging.error("initdb failed to execute command 3")
+    connection.commit()
+
 
 def listAll(db):
     try:
@@ -84,7 +95,7 @@ def search(db, query):
     except:
         logging.error("search failed to execute")
     rows = cursor.fetchall()
-    if db is not "Inventory":
+    if db != "Inventory":
         for row in rows:
             itemnumber = row[0]
             name = row[1]
@@ -103,9 +114,10 @@ def search(db, query):
             checkedoutby = row[7]
             checkedoutdate = row[8]
             category = row[9]
-            if query.lower() in (name+description+storelocation+barcode).lower():
-                print("Itemnumber: {}, Name: {}, description: {}, storelocation: {}, stock: {}, minstock: {}, category: {}, barcode: {}, checkedoutby: {}, checkedoutdate: {}"
-                      "".format(itemnumber, name, description, storelocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+            sublocation = row[10]
+            if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
+                print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}"
+                      "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 def sqlCommand(sql_command):
     try:
@@ -136,10 +148,10 @@ def delete(db):
     connection.commit()
 
 
-def appendDB(table, name, description, storelocation, stock, minstock, barcode, category):
-    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category) VALUES (null,"{}","{}","{}","{}","{}","{}","{}");"""
+def appendDB(table, name, description, storelocation, stock, minstock, barcode, category, sublocation):
+    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category, Sublocation) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}");"""
     try:
-        cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category))
+        cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category, sublocation))
     except:
         logging.error("appendDB failed to execute")
 
@@ -169,10 +181,21 @@ def checkMinStock(stock, minstock):
 
 # TODO: remove test function
 def test(db):
-    listAll(db)
+    dbreturn = listAll(db)
+
     var = input("Select a number from the list for {} or write new: ".format(db))
-    appendDBCategory(db, var)
-    return var
+    if var.isdigit == True:
+        for x in dbreturn:
+            if str(x[0]) == str(var):
+                print("for if")
+                return x[1]
+            else:
+                print("for else")
+                pass
+    else:
+        print("else {}".format(var))
+        appendDBCategory(db, var)
+        return var
 
 
 def menu():
@@ -186,6 +209,7 @@ Press L to list all items
 Press D to delete a items
 Press cat to goto category menu
 Press store to goto category menu
+Press sub to goto category menu
 Press Q to exit
 
     """)
@@ -196,15 +220,16 @@ Press Q to exit
 
     elif menuselection == "a":
         name = input("Enter name: ")
-        description = input("Enter description: ")
-        storelocation = test("Location")
-        print(storelocation)
-        stock = input("Enter stock: ")
-        minstock = input("Enter min stock: ")
-        barcode = input("Enter barcode (you can scan the barcode): ")
+        if name != "":
+            description = input("Enter description: ")
+            storelocation = test("Location")
+            substorelocation = test("SubLocation")
+            stock = input("Enter stock: ")
+            minstock = input("Enter min stock: ")
+            barcode = input("Enter barcode (you can scan the barcode): ")
 
-        category = test("Category")
-        appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category)
+            category = test("Category")
+            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
     elif menuselection.isdigit():
         search("Inventory", menuselection)
@@ -275,6 +300,29 @@ Press enter to select
             else:
                 continue
 
+    elif menuselection == "sub":
+        while True:
+            print("""l
+            
+Press A to add
+Press L to list all Sub location
+Press D to delete a Sub location
+Press Q to exit to main menu
+Press enter to select
+
+""")
+            menuselection = input()
+            if menuselection == "a":
+                name = input("Enter Sub location name: ")
+                appendDBCategory("SubLocation", name)
+            elif menuselection == "l":
+                listAll("SubLocation")
+            elif menuselection == "d":
+                delete("SubLocation")
+            elif menuselection == "q":
+                break
+            else:
+                continue
 
     elif menuselection == "l":
         search("Inventory", "")
@@ -287,7 +335,6 @@ Press enter to select
 
 
 if __name__ == '__main__':
-
     while True:
         menu()
     connection.close()
