@@ -82,7 +82,7 @@ def listAll(db):
     try:
         cursor.execute('SELECT * FROM {}'.format(db))
     except:
-        logging.error("listAll failed to execute")
+        logging.error("listAll failed to execute, most likely incorrect table name: {}".format(db))
     rows = cursor.fetchall()
     for row in rows:
         print(row)
@@ -169,34 +169,37 @@ def appendDBCategory(table, name):
 
 
 def checkMinStock(stock, minstock):
-    minstock = int(minstock)
-    stock = int(stock)
-    if stock <= minstock:
-        val = "Stock({}) is less than minstock({})".format(stock, minstock)
-    else:
-        val = "Stock({}) is more than minstock({})".format(stock, minstock)
-    print("val = {}".format(val))
-    return val
+    try:
+        minstock = int(minstock)
+        stock = int(stock)
+        if stock <= minstock:
+            val = "Stock({}) is less than minstock({})".format(stock, minstock)
+        else:
+            val = "Stock({}) is more than minstock({})".format(stock, minstock)
+        print("val = {}".format(val))
+        return val
+    except:
+        logging.error("Cant convert string to int")
+        return 
 
 
-# TODO: remove test function
-def test(db):
+def dbquerry(db):
     dbreturn = listAll(db)
 
-    var = input("Select a number from the list for {} or write new: ".format(db))
+    inputvar = input("Select a number from the list for {} or write new: ".format(db))
     try:
-        var = int(var)
+        inputvar = int(inputvar)
         for x in dbreturn:
-            if str(x[0]) == str(var):
-                print("for if")
+            if str(x[0]) == str(inputvar):
+                logging.debug("Input is found and a number")
                 return x[1]
             else:
-                print("for else")
+                logging.debug("Input are a number, but not found")
                 pass
     except:
-        print("else {}".format(var))
-        appendDBCategory(db, var)
-        return var
+        print("else {}".format(inputvar))
+        appendDBCategory(db, inputvar)
+        return inputvar
 
 
 def menu():
@@ -223,13 +226,13 @@ Press Q to exit
         name = input("Enter name: ")
         if name != "":
             description = input("Enter description: ")
-            storelocation = test("Location")
-            substorelocation = test("SubLocation")
+            storelocation = dbquerry("Location")
+            substorelocation = dbquerry("SubLocation")
             stock = input("Enter stock: ")
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
 
-            category = test("Category")
+            category = dbquerry("Category")
             appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
     elif menuselection.isdigit():
@@ -238,7 +241,7 @@ Press Q to exit
     elif menuselection == "u":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Inventory number or R: ")
+        itenmnumber = input("Inventory number: ")
         # Add retry
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
