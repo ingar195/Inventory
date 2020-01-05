@@ -1,6 +1,9 @@
 import sqlite3
 import re
 import logging
+from datetime import datetime
+
+
 connection = sqlite3.connect("Inventory.db")
 
 cursor = connection.cursor()
@@ -90,6 +93,7 @@ def listAll(db):
 
 
 def search(db, query):
+    print(" ") # For cleaner output
     try:
         cursor.execute('SELECT * FROM {}'.format(db))
     except:
@@ -100,7 +104,7 @@ def search(db, query):
             itemnumber = row[0]
             name = row[1]
             if re.search(query, name, re.IGNORECASE) is not None:
-                print("Itemnumber: {}, Name: {}".format(itemnumber, name))
+                print("Itemnumber: {}, Name: {}\n".format(itemnumber, name))
 
     else:
         for row in rows:
@@ -116,7 +120,7 @@ def search(db, query):
             category = row[9]
             sublocation = row[10]
             if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
-                print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}"
+                print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}\n"
                       "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
 def sqlCommand(sql_command):
@@ -198,9 +202,21 @@ def dbquerry(db):
                 pass
     except:
         print("else {}".format(inputvar))
-        appendDBCategory(db, inputvar)
+        try:
+            appendDBCategory(db, inputvar)
+        except:
+            logging.error("Failed to append DB, check if {} is the correct".format(db))
         return inputvar
 
+
+def gettime():
+    now = datetime.now() 
+    logging.debug("now = {}".format(now))
+    # dd/mm/YY H:M:S
+    dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+    logging.debug("date and time = {}".format(dt_string))	
+    return dt_string
+    
 
 def menu():
     print("""
@@ -225,15 +241,18 @@ Press Q to exit
     elif menuselection == "a":
         name = input("Enter name: ")
         if name != "":
+            logging.debug("Name ins not none")
             description = input("Enter description: ")
             storelocation = dbquerry("Location")
             substorelocation = dbquerry("SubLocation")
             stock = input("Enter stock: ")
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
-
             category = dbquerry("Category")
-            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
+            try:
+                appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
+            except:
+                logging.error("Failed to append DB")
 
     elif menuselection.isdigit():
         search("Inventory", menuselection)
@@ -242,14 +261,18 @@ Press Q to exit
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
         itenmnumber = input("Inventory number: ")
-        # Add retry
         update("Inventory", itenmnumber, "stock", input("new Stock\n"))
 
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Enter itenm number: ")
+        itenmnumber = input("Enter item number: ")
+        # TODO print current stock
         value = input("Enter new value: ")
+        # TODO check minstock
+        #TODO add this to the database 
+        checkoutname = input("Enter your name: ")
+        checkoutdate = gettime()
         update("Inventory", itenmnumber, "stock", value)
 
     elif menuselection == "d":
@@ -278,7 +301,6 @@ Press enter to select
                 break
             else:
                 continue
-
 
     elif menuselection == "store":
         while True:
@@ -344,5 +366,3 @@ if __name__ == '__main__':
     connection.close()
 else:
     pass
-
-# gard was here
