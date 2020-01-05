@@ -202,10 +202,7 @@ def dbquerry(db):
                 pass
     except:
         print("else {}".format(inputvar))
-        try:
-            appendDBCategory(db, inputvar)
-        except:
-            logging.error("Failed to append DB, check if {} is the correct".format(db))
+        appendDBCategory(db, inputvar)
         return inputvar
 
 
@@ -249,10 +246,8 @@ Press Q to exit
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
             category = dbquerry("Category")
-            try:
-                appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
-            except:
-                logging.error("Failed to append DB")
+            appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
+
 
     elif menuselection.isdigit():
         search("Inventory", menuselection)
