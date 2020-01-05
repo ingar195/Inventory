@@ -3,33 +3,15 @@ import re
 import logging
 from datetime import datetime
 
+#TODO Cleanup sql execution
 
 connection = sqlite3.connect("Inventory.db")
 
 cursor = connection.cursor()
 
-
-def listTables():
-    try:
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    except:
-        logging.error("listTables execute failed")
-    print(cursor.fetchall())
-    return cursor.fetchall()
-
-
-def listColums(table):
-    try:
-        cursor.execute("""PRAGMA table_info('{}');""".format(table))
-    except:
-        logging.error("listColums execute failed")
-    print(cursor.fetchall())
-    return cursor
-
-
+# TODO Cleanup init
 def initDB():
-    # Check if table exists
-    sql_command = """
+    initvar = ["""
     CREATE TABLE Inventory ( 
     itemnumber INTEGER PRIMARY KEY, 
     name VARCHAR(255), 
@@ -41,52 +23,26 @@ def initDB():
     checkedoutby VARCHAR(255), 
     checkedoutdate VARCHAR(255),
     category VARCHAR(255)),
-    Sublocation VARCHAR(255));"""
-
-    try:
-        cursor.execute(sql_command)
-    except:
-        logging.error("initDB failed to execute")
-    connection.commit()
-
-    sql_command = """
+    Sublocation VARCHAR(255));""",
+    """
     CREATE TABLE Category ( 
     itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255));"""
-
-    try:
-        cursor.execute(sql_command)
-    except:
-        logging.error("initdb failed to execute command 2")
-    connection.commit()
-
-    sql_command = """
+    name VARCHAR(255));""",
+    """
     CREATE TABLE Location ( 
     itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255));"""
-    try:
-        cursor.execute(sql_command)
-    except:
-        logging.error("initdb failed to execute command 3")
-    connection.commit()
-
-    sql_command = """
+    name VARCHAR(255));""",
+    """
     CREATE TABLE SubLocation ( 
     itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255));"""
-    try:
-        cursor.execute(sql_command)
-    except:
-        logging.error("initdb failed to execute command 3")
-    connection.commit()
+    name VARCHAR(255));"""]
+
+    for item in initvar:
+        sqlCommand(item)
 
 
 def listAll(db):
-    try:
-        cursor.execute('SELECT * FROM {}'.format(db))
-    except:
-        logging.error("listAll failed to execute, most likely incorrect table name: {}".format(db))
-    rows = cursor.fetchall()
+    rows = sqlCommand('SELECT * FROM {}'.format(db))
     for row in rows:
         print(row)
     return rows
@@ -94,11 +50,7 @@ def listAll(db):
 
 def search(db, query):
     print(" ") # For cleaner output
-    try:
-        cursor.execute('SELECT * FROM {}'.format(db))
-    except:
-        logging.error("search failed to execute")
-    rows = cursor.fetchall()
+    rows = sqlCommand('SELECT * FROM {}'.format(db))
     if db != "Inventory":
         for row in rows:
             itemnumber = row[0]
@@ -123,21 +75,20 @@ def search(db, query):
                 print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}\n"
                       "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
 
+
 def sqlCommand(sql_command):
     try:
         cursor.execute(sql_command)
     except:
-        logging.error("sqlCommand failed to execute")
+        logging.error("sqlCommand failed to execute: ")
     connection.commit()
+    return cursor.fetchall()
 
 
 def update(db, itemnumber, colum, value):
     sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
-    try:
-        cursor.execute(sql_command.format(db, colum, value, itemnumber))
-    except:
-        logging.error("update failed to execute")
-    connection.commit()
+    sqlCommand(sql_command.format(db, colum, value, itemnumber))
+ 
 
 
 def delete(db):
@@ -145,31 +96,17 @@ def delete(db):
     search(db, inputval)
     itemnumber = input("Enter item number you want to delete: ")
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
-    try:
-        cursor.execute(sql_command.format(db, itemnumber))
-    except:
-        logging.error("delete failed to execute")
-    connection.commit()
+    sqlCommand(sql_command.format(db, itemnumber))
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category, sublocation):
     sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category, Sublocation) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}");"""
-    try:
-        cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category, sublocation))
-    except:
-        logging.error("appendDB failed to execute")
-
-    connection.commit()
+    sqlCommand(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category, sublocation))
 
 
 def appendDBCategory(table, name):
-    # Check if exist func
     sql_command = """INSERT INTO {} (itemnumber, name) VALUES (null,"{}");"""
-    try:
-        cursor.execute(sql_command.format(table, name))
-    except:
-        logging.error("appendDBCategory failed to execute")
-    connection.commit()
+    sqlCommand(sql_command.format(table, name))   
 
 
 def checkMinStock(stock, minstock):
