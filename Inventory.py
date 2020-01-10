@@ -3,11 +3,6 @@ import re
 import logging
 from datetime import datetime
 
-connection = sqlite3.connect("Inventory.db")
-
-cursor = connection.cursor()
-
-
 def initDB():
     initvar = ["""
     CREATE TABLE Inventory ( 
@@ -49,33 +44,32 @@ def listAll(db):
 def search(db, query):
     print(" ") # For cleaner output
     rows = sqlCommand('SELECT * FROM {}'.format(db))
-    if db != "Inventory":
-        for row in rows:
-            itemnumber = row[0]
-            name = row[1]
-            if re.search(query, name, re.IGNORECASE) is not None:
-                print("Itemnumber: {}, Name: {}\n".format(itemnumber, name))
-            else:
-                return None
+    if rows != None:
+        if db != "Inventory":
+            for row in rows:
+                itemnumber = row[0]
+                name = row[1]
+                if re.search(query, name, re.IGNORECASE) is not None:
+                    print("Itemnumber: {}, Name: {}\n".format(itemnumber, name))
 
+        else:
+            for row in rows:
+                itemnumber = row[0]
+                name = row[1]
+                description = row[2]
+                storelocation = row[3]
+                stock = row[4]
+                minstock = row[5]
+                barcode = row[6]
+                checkedoutby = row[7]
+                checkedoutdate = row[8]
+                category = row[9]
+                sublocation = row[10]
+                if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
+                    print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}\n"
+                        "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
     else:
-        for row in rows:
-            itemnumber = row[0]
-            name = row[1]
-            description = row[2]
-            storelocation = row[3]
-            stock = row[4]
-            minstock = row[5]
-            barcode = row[6]
-            checkedoutby = row[7]
-            checkedoutdate = row[8]
-            category = row[9]
-            sublocation = row[10]
-            if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
-                print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}\n"
-                      "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-            else:
-                return None
+        logging.info("No item's in {}".format(db))
 
 def sqlCommand(sql_command):
     try:
@@ -98,6 +92,7 @@ def delete(db):
     itemnumber = input("Enter item number you want to delete: ")
     sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
     sqlCommand(sql_command.format(db, itemnumber))
+    #TODO handle non existent itemnumber
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category, sublocation):
@@ -211,7 +206,6 @@ Press Q to exit
             category = locAndCatSelector("Category")
             appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
-
     elif menuselection.isdigit():
         search("Inventory", menuselection)
 
@@ -255,8 +249,12 @@ Press Q to exit
 
 
 if __name__ == '__main__':
+    connection = sqlite3.connect("Inventory.db")
+    cursor = connection.cursor()
+
     while True:
         menu()
     connection.close()
+
 else:
     pass
