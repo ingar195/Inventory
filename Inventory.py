@@ -3,13 +3,11 @@ import re
 import logging
 from datetime import datetime
 
-#TODO Cleanup sql execution
-
 connection = sqlite3.connect("Inventory.db")
 
 cursor = connection.cursor()
 
-# TODO Cleanup init
+
 def initDB():
     initvar = ["""
     CREATE TABLE Inventory ( 
@@ -57,6 +55,8 @@ def search(db, query):
             name = row[1]
             if re.search(query, name, re.IGNORECASE) is not None:
                 print("Itemnumber: {}, Name: {}\n".format(itemnumber, name))
+            else:
+                return None
 
     else:
         for row in rows:
@@ -74,7 +74,8 @@ def search(db, query):
             if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
                 print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}\n"
                       "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
-
+            else:
+                return None
 
 def sqlCommand(sql_command):
     try:
@@ -124,7 +125,7 @@ def checkMinStock(stock, minstock):
         return 
 
 
-def dbquerry(db):
+def locAndCatSelector(db):
     dbreturn = listAll(db)
 
     inputvar = input("Select a number from the list for {} or write new: ".format(db))
@@ -152,6 +153,31 @@ def gettime():
     return dt_string
     
 
+def SubMenu(name, db):
+        while True:
+            print("""
+            
+Press A to add
+Press L to list all {}
+Press D to delete a {}
+Press Q to exit to main menu
+Press enter to select
+""".format(name, name))
+
+            menuselection = input()
+            if menuselection == "a":
+                name = input("Enter {} name: ".format(name))
+                appendDBCategory(db, name)
+            elif menuselection == "l":
+                listAll(db)
+            elif menuselection == "d":
+                delete(db)
+            elif menuselection == "q":
+                break
+            else:
+                continue
+
+
 def menu():
     print("""
     
@@ -177,12 +203,12 @@ Press Q to exit
         if name != "":
             logging.debug("Name ins not none")
             description = input("Enter description: ")
-            storelocation = dbquerry("Location")
-            substorelocation = dbquerry("SubLocation")
+            storelocation = locAndCatSelector("Location")
+            substorelocation = locAndCatSelector("SubLocation")
             stock = input("Enter stock: ")
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
-            category = dbquerry("Category")
+            category = locAndCatSelector("Category")
             appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
 
@@ -197,90 +223,26 @@ Press Q to exit
 
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
-        search("Inventory", inputval)
+        search("Inventory", inputval)        # TODO if no return from search 
         itenmnumber = input("Enter item number: ")
         # TODO print current stock
         value = input("Enter new value: ")
         # TODO check minstock
         #TODO add this to the database 
         checkoutname = input("Enter your name: ")
-        checkoutdate = gettime()
         update("Inventory", itenmnumber, "stock", value)
 
     elif menuselection == "d":
         delete("Inventory")
 
     elif menuselection == "cat":
-        while True:
-            print("""
-            
-Press A to add
-Press L to list all categories
-Press D to delete a categories
-Press Q to exit to main menu
-Press enter to select
-
-""")
-            menuselection = input()
-            if menuselection == "a":
-                name = input("Enter Category name: ")
-                appendDBCategory("Category", name)
-            elif menuselection == "l":
-                listAll("Category")
-            elif menuselection == "d":
-                delete("Category")
-            elif menuselection == "q":
-                break
-            else:
-                continue
+        SubMenu("Category", "Category")
 
     elif menuselection == "store":
-        while True:
-            print("""
-            
-Press A to add
-Press L to list all store location
-Press D to delete a store location
-Press Q to exit to main menu
-Press enter to select
-
-""")
-            menuselection = input()
-            if menuselection == "a":
-                name = input("Enter Location name: ")
-                appendDBCategory("Location", name)
-            elif menuselection == "l":
-                listAll("Location")
-            elif menuselection == "d":
-                delete("Location")
-            elif menuselection == "q":
-                break
-            else:
-                continue
+        SubMenu("Location", "Location")
 
     elif menuselection == "sub":
-        while True:
-            print("""l
-            
-Press A to add
-Press L to list all Sub location
-Press D to delete a Sub location
-Press Q to exit to main menu
-Press enter to select
-
-""")
-            menuselection = input()
-            if menuselection == "a":
-                name = input("Enter Sub location name: ")
-                appendDBCategory("SubLocation", name)
-            elif menuselection == "l":
-                listAll("SubLocation")
-            elif menuselection == "d":
-                delete("SubLocation")
-            elif menuselection == "q":
-                break
-            else:
-                continue
+        SubMenu("Sub location", "SubLocation")
 
     elif menuselection == "l":
         search("Inventory", "")
