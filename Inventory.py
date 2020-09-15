@@ -1,5 +1,6 @@
 import sqlite3
 import re
+import code128
 from datetime import date
 
 connection = sqlite3.connect("Inventory.db")
@@ -179,6 +180,11 @@ def test(db):
         var2 = var
         appendDBCategory(db, var2)
     return var2
+
+
+def barcodeGenerator():
+    print("barcode")
+    code128.image("Hello World").save("Hello World.png")  # with PIL present
 
 
 def menu():
