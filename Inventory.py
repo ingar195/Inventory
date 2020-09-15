@@ -137,8 +137,7 @@ def update(db, itemnumber, colum, value):
         except:
             logging.error("update failed to execute")
         connection.commit()
-    elif value.lower() == "q":
-        break
+
 
 def delete(db):
     inputval = input("Scan barcode or write name:\n")
@@ -153,13 +152,14 @@ def delete(db):
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category, sublocation):
-    sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category, Sublocation) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}");"""
-    try:
-        cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category, sublocation))
-    except:
-        logging.error("appendDB failed to execute")
+    if name.lower() != "q" and description.lower() != "q" and storelocation.lower() != "q" and stock.lower() != "q" and minstock.lower() != "q" and barcode.lower() != "q" and category.lower() != "q" and sublocation.lower() != "q": 
+        sql_command = """INSERT INTO {} (itemnumber, name, description, storelocation, stock, minstock, barcode, category, Sublocation) VALUES (null,"{}","{}","{}","{}","{}","{}","{}","{}");"""
+        try:
+            cursor.execute(sql_command.format(table, name, description, storelocation, stock, minstock, barcode, category, sublocation))
+        except:
+            logging.error("appendDB failed to execute")
 
-    connection.commit()
+        connection.commit()
 
 
 def appendDBCategory(table, name):
@@ -187,15 +187,16 @@ def SelectorCreator(db):
     dbreturn = listAll(db)
 
     var = input("Select a number from the list for {} or write new: ".format(db))
-    try:
-        var = int(var)
-        for x in dbreturn:
-            if str(x[0]) == str(var):
-                return x[1]
-    except:
-        logging.debug("Created {}".format(var))
-        appendDBCategory(db, var)
-        return var
+    if var != "" and var.lower() != "q":
+        try:
+            var = int(var)
+            for x in dbreturn:
+                if str(x[0]) == str(var):
+                    return x[1]
+        except:
+            logging.debug("Created {}".format(var))
+            appendDBCategory(db, var)
+            return var
 
 
 def menu():
@@ -224,13 +225,13 @@ Press Q to exit
         name = input("Enter name: ")
         if name != "":
             description = input("Enter description: ")
-            storelocation = SelectorCreator("Location")
-            substorelocation = SelectorCreator("SubLocation")
+            storelocation = str(SelectorCreator("Location"))
+            substorelocation = str(SelectorCreator("SubLocation"))
             stock = input("Enter stock: ")
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
 
-            category = SelectorCreator("Category")
+            category = str(SelectorCreator("Category"))
             appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
     elif menuselection.isdigit():
