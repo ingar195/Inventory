@@ -181,8 +181,7 @@ def checkMinStock(stock, minstock):
     return val
 
 
-# TODO: remove test function
-def test(db):
+def SelectorCreator(db):
     dbreturn = listAll(db)
 
     var = input("Select a number from the list for {} or write new: ".format(db))
@@ -190,29 +189,27 @@ def test(db):
         var = int(var)
         for x in dbreturn:
             if str(x[0]) == str(var):
-                print("for if")
                 return x[1]
-            else:
-                print("for else")
-                pass
     except:
-        print("else {}".format(var))
+        logging.debug("Created {}".format(var))
         appendDBCategory(db, var)
         return var
 
 
 def menu():
     print("""
-    
-Press S for search
 Press A to add
-Press U to update
 Press C to checkout
-Press L to list all items
+Press E to edit
 Press D to delete a items
+Press L to list all items  
+Press S for search
+Press U to update
+
 Press cat to goto category menu
 Press store to goto category menu
 Press sub to goto category menu
+
 Press Q to exit
 
     """)
@@ -225,13 +222,13 @@ Press Q to exit
         name = input("Enter name: ")
         if name != "":
             description = input("Enter description: ")
-            storelocation = test("Location")
-            substorelocation = test("SubLocation")
+            storelocation = SelectorCreator("Location")
+            substorelocation = SelectorCreator("SubLocation")
             stock = input("Enter stock: ")
             minstock = input("Enter min stock: ")
             barcode = input("Enter barcode (you can scan the barcode): ")
 
-            category = test("Category")
+            category = SelectorCreator("Category")
             appendDB("Inventory", name, description, storelocation, stock, minstock, barcode, category, substorelocation)
 
     elif menuselection.isdigit():
@@ -240,19 +237,27 @@ Press Q to exit
     elif menuselection == "u":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Inventory number or R: ")
+        itemnumber = input("Inventory number or R: ")
         # Add retry
-        update("Inventory", itenmnumber, "stock", input("new Stock\n"))
+        update("Inventory", itemnumber, "stock", input("new Stock\n"))
 
     elif menuselection == "c":
         inputval = input("Scan barcode or write name:\n")
         search("Inventory", inputval)
-        itenmnumber = input("Enter itenm number: ")
+        itemnumber = input("Enter item number: ")
         value = input("Enter new value: ")
-        update("Inventory", itenmnumber, "stock", value)
+        update("Inventory", itemnumber, "stock", value)
 
     elif menuselection == "d":
         delete("Inventory")
+
+    elif menuselection == "e":
+        inputval = input("Scan barcode or write name:\n")
+        search("Inventory", inputval)
+        itemnumber = input("Enter item number: ")
+        # Add retry
+        update("Inventory", itemnumber, "name", input("new name\n"))
+        update("Inventory", itemnumber, "description", input("new description\n"))
 
     elif menuselection == "cat":
         while True:
