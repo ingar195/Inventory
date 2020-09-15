@@ -120,6 +120,7 @@ def search(db, query):
             if query.lower() in (name+description+storelocation+barcode+sublocation+category).lower():
                 print("Itemnumber: {}, Name: {}, Description: {}, Store location: {}, Sub location: {}, Stock: {}, Min stock: {}, Category: {}, Barcode: {}, Checked out by: {}, Checked out date: {}"
                       "".format(itemnumber, name, description, storelocation, sublocation, stock, minstock, category, barcode, checkedoutby, checkedoutdate))
+    return rows
 
 def sqlCommand(sql_command):
     try:
@@ -140,15 +141,27 @@ def update(db, itemnumber, colum, value):
 
 
 def delete(db):
+    #if in inventory
     inputval = input("Scan barcode or write name:\n")
-    search(db, inputval)
-    itemnumber = input("Enter item number you want to delete: ")
-    sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
-    try:
-        cursor.execute(sql_command.format(db, itemnumber))
-    except:
-        logging.error("delete failed to execute")
-    connection.commit()
+    skip = False
+    if db != "Inventory":
+        print("Search =")
+        for item in search("Inventory", db):
+            print(item)
+            if db in item:
+                skip = True
+                break            
+        if not skip:
+            search(db, inputval)
+            itemnumber = input("Enter item number you want to delete: ")
+            sql_command = """DELETE FROM {} WHERE itemnumber = {};"""
+            try:
+                cursor.execute(sql_command.format(db, itemnumber))
+            except:
+                logging.error("delete failed to execute")
+            connection.commit()
+        else:
+            print("{} is in use can not delete".format(db))
 
 
 def appendDB(table, name, description, storelocation, stock, minstock, barcode, category, sublocation):
@@ -261,6 +274,7 @@ Press Q to exit
         # Add retry
         update("Inventory", itemnumber, "name", input("new name\n"))
         update("Inventory", itemnumber, "description", input("new description\n"))
+        update("Inventory", itemnumber, "minstock", input("new minstock\n"))
 
     elif menuselection == "cat":
         while True:
