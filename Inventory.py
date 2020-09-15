@@ -1,8 +1,12 @@
 import sqlite3
 import re
 import logging
-connection = sqlite3.connect("Inventory.db")
+import os
 
+DBFile = "Inventory.db"
+DBExist = os.path.exists(DBFile)
+
+connection = sqlite3.connect(DBFile)
 cursor = connection.cursor()
 
 
@@ -28,8 +32,8 @@ def initDB():
     # Check if table exists
     sql_command = """
     CREATE TABLE Inventory ( 
-    itemnumber INTEGER PRIMARY KEY, 
-    name VARCHAR(255), 
+    itemnumber INTEGER PRIMARY KEY,
+    name VARCHAR(255),
     description VARCHAR(255), 
     storelocation VARCHAR(255), 
     stock VARCHAR(255), 
@@ -37,13 +41,11 @@ def initDB():
     barcode VARCHAR(255), 
     checkedoutby VARCHAR(255), 
     checkedoutdate VARCHAR(255),
-    category VARCHAR(255)),
+    category VARCHAR(255),
     Sublocation VARCHAR(255));"""
 
-    try:
-        cursor.execute(sql_command)
-    except:
-        logging.error("initDB failed to execute")
+    cursor.execute(sql_command)
+
     connection.commit()
 
     sql_command = """
@@ -74,7 +76,7 @@ def initDB():
     try:
         cursor.execute(sql_command)
     except:
-        logging.error("initdb failed to execute command 3")
+        logging.error("initdb failed to execute command 4")
     connection.commit()
 
 
@@ -336,6 +338,8 @@ Press enter to select
 
 
 if __name__ == '__main__':
+    if not DBExist:
+        initDB()
     while True:
         menu()
     connection.close()
