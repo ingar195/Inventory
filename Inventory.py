@@ -130,13 +130,15 @@ def sqlCommand(sql_command):
 
 
 def update(db, itemnumber, colum, value):
-    sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
-    try:
-        cursor.execute(sql_command.format(db, colum, value, itemnumber))
-    except:
-        logging.error("update failed to execute")
-    connection.commit()
-
+    if value != "":        
+        sql_command = """UPDATE {} SET {} = '{}' WHERE itemnumber = {};"""
+        try:
+            cursor.execute(sql_command.format(db, colum, value, itemnumber))
+        except:
+            logging.error("update failed to execute")
+        connection.commit()
+    elif value.lower() == "q":
+        break
 
 def delete(db):
     inputval = input("Scan barcode or write name:\n")
